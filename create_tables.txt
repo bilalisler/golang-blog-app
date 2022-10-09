@@ -1,54 +1,63 @@
-DROP TABLE if exists public.users;
-CREATE TABLE IF NOT EXISTS public.users (
-	username text NOT NULL,
-	"password" text NOT NULL,
-	firstname text,
-	lastname text,
-	profile_pic text,
-	email text,
-	PRIMARY KEY(username)
-);
+-- Create syntax for TABLE 'categories'
+CREATE TABLE `categories` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) DEFAULT '',
+  `parent` bigint(20) DEFAULT NULL,
+  `slug` varchar(255) DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
-CREATE SEQUENCE IF NOT EXISTS posts_sampleid_seq;
-CREATE TABLE IF NOT EXISTS public.posts (
-	id bigint DEFAULT nextval('posts_sampleid_seq'::regclass) NOT NULL,
-	body text,
-	username text NOT NULL,
-	PRIMARY KEY(id)
-);
+-- Create syntax for TABLE 'comments'
+CREATE TABLE `comments` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `post_id` bigint(20) unsigned DEFAULT NULL,
+  `status` tinyint(4) DEFAULT NULL,
+  `slug` varchar(255) DEFAULT NULL,
+  `title` varchar(200) DEFAULT NULL,
+  `content` longtext,
+  `created_at` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_comments_user` (`user_id`),
+  KEY `fk_comments_post` (`post_id`),
+  CONSTRAINT `fk_comments_post` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`),
+  CONSTRAINT `fk_comments_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 
-ALTER TABLE IF EXISTS public.posts
-	ADD CONSTRAINT posts_username_fkey
-	FOREIGN KEY (username)
-	REFERENCES users (username)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE;
-	
-CREATE SEQUENCE IF NOT EXISTS likes_sampleid_seq;
-CREATE TABLE IF NOT EXISTS public.likes (
-	id bigint DEFAULT nextval('likes_sampleid_seq'::regclass) NOT NULL,
-	post_id bigint NOT NULL,
-	user_name text NOT NULL,
-	is_liked boolean DEFAULT false NOT NULL,
-	PRIMARY KEY(id)
-);
+-- Create syntax for TABLE 'posts'
+CREATE TABLE `posts` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `status` tinyint(4) DEFAULT NULL,
+  `slug` varchar(255) DEFAULT NULL,
+  `title` varchar(200) CHARACTER SET utf8 DEFAULT NULL,
+  `content` longtext,
+  `category_id` bigint(20) DEFAULT NULL,
+  `created_at` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_posts_category` (`category_id`),
+  KEY `fk_posts_user` (`user_id`),
+  CONSTRAINT `fk_posts_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
+  CONSTRAINT `fk_posts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
 
+-- Create syntax for TABLE 'tags'
+CREATE TABLE `tags` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `slug` varchar(100) DEFAULT NULL,
+  `created_at` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS public.followers (
-	user_id text NOT NULL,
-	following_id text NOT NULL,
-);
-
-ALTER TABLE IF EXISTS public.followers
-	ADD CONSTRAINT followers_user_id_fkey
-	FOREIGN KEY (user_id)
-	REFERENCES users (username)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE;
-
-ALTER TABLE IF EXISTS public.followers
-	ADD CONSTRAINT followers_following_id_fkey
-	FOREIGN KEY (following_id)
-	REFERENCES users (username)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE;
+-- Create syntax for TABLE 'users'
+CREATE TABLE `users` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `user_name` varchar(100) DEFAULT NULL,
+  `password_hash` varchar(255) DEFAULT NULL,
+  `registered_at` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
