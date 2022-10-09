@@ -1,23 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/go-blog-app/database"
-	handler "github.com/go-blog-app/handlers"
-	"github.com/gorilla/mux"
-	"net/http"
+	"github.com/go-blog-app/routes"
+	_ "net/http"
 )
 
 func main() {
 	database.InitDB()
-	initRouting()
-}
 
-func initRouting() {
-	r := mux.NewRouter()
+	router := gin.Default()
+	routes.PostRoutes(router)
 
-	r.HandleFunc("/", handler.IndexHandler).Methods("GET")
-
-	fmt.Println("http://127.0.0.1:8086")
-	http.ListenAndServe("127.0.0.1:8086", r)
+	router.Run(":8080")
 }

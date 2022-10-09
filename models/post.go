@@ -1,48 +1,19 @@
 package models
 
 import (
-	"github.com/go-blog-app/database"
-	"log"
+	"time"
 )
 
 type Post struct {
-	Id       int
-	Body     string
-	username string
-}
-
-func UserPosts(username string) []Post {
-	rows, err := database.DB.Query("select id,body,username from posts where username = ?", username)
-	if err != nil {
-		panic(err)
-	}
-	defer rows.Close()
-
-	var posts []Post
-	for rows.Next() {
-		var (
-			post     Post
-			id       int
-			body     string
-			username string
-		)
-		err = rows.Scan(&id, &body, &username)
-		if err != nil {
-			panic(err)
-		}
-		post = Post{
-			id,
-			body,
-			username,
-		}
-
-		posts = append(posts, post)
-	}
-
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return posts
+	ID         int `gorm:"primarykey;autoIncrement"`
+	UserID     int `validate:"required" json:"user_id"`
+	User       *User
+	Status     int8   `validate:"required" json:"status"`
+	Slug       string `gorm:"type:string;size:255" validate:"required"`
+	Title      string `gorm:"type:string;size:200" validate:"required" json:"title"`
+	Content    string `validate:"required" json:"content"`
+	CategoryId int    `validate:"required" json:"category_id"`
+	Category   *Category
+	Comments   []*Comment
+	CreatedAt  time.Time `validate:"required"`
 }
